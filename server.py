@@ -7,6 +7,9 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "ads.db"
 app = Flask(__name__, static_folder="static")
+@app.route("/health")
+def health():
+    return {"status": "ok"}
 
 # ---------- Database Setup ----------
 def init_db():
@@ -33,6 +36,18 @@ def init_db():
             ad_id INTEGER,
             event TEXT,
             ts TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS leads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ad_id INTEGER,
+            name TEXT,
+            email TEXT,
+            phone TEXT,
+            timing TEXT,
+            message TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
     """)
     conn.commit()
