@@ -149,14 +149,9 @@ def ads():
         ))
         conn.commit()
         conn.close()
-        # Fetch advertiser URL for redirect
-    conn2 = db()
-    ad_row = conn2.execute("SELECT url FROM ads WHERE id = ?", (ad_id,)).fetchone()
-    conn2.close()
-    redirect_url = ad_row["url"] if ad_row else "https://example.com"
+        return jsonify({"ok": True})
 
-    return jsonify({"ok": True, "redirect_url": redirect_url})
-
+    # GET: return all ads
     rows = conn.execute("SELECT * FROM ads ORDER BY id DESC").fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
@@ -167,13 +162,6 @@ def delete_ad(ad_id):
     conn.execute("DELETE FROM ads WHERE id = ?", (ad_id,))
     conn.commit()
     conn.close()
-    # Fetch advertiser URL for redirect
-    conn2 = db()
-    ad_row = conn2.execute("SELECT url FROM ads WHERE id = ?", (ad_id,)).fetchone()
-    conn2.close()
-    redirect_url = ad_row["url"] if ad_row else "https://example.com"
-
-    return jsonify({"ok": True, "redirect_url": redirect_url})
 
 @app.route("/api/stats")
 def stats():
@@ -225,13 +213,6 @@ def track_conversion():
                  (ad_id, value))
     conn.commit()
     conn.close()
-    # Fetch advertiser URL for redirect
-    conn2 = db()
-    ad_row = conn2.execute("SELECT url FROM ads WHERE id = ?", (ad_id,)).fetchone()
-    conn2.close()
-    redirect_url = ad_row["url"] if ad_row else "https://example.com"
-
-    return jsonify({"ok": True, "redirect_url": redirect_url})
 
 # Add value column to events table (run once)
 def migrate_db():
@@ -273,13 +254,6 @@ def capture_lead():
           data.get("phone"), data.get("timing"), data.get("message")))
     conn.commit()
     conn.close()
-    # Fetch advertiser URL for redirect
-    conn2 = db()
-    ad_row = conn2.execute("SELECT url FROM ads WHERE id = ?", (ad_id,)).fetchone()
-    conn2.close()
-    redirect_url = ad_row["url"] if ad_row else "https://example.com"
-
-    return jsonify({"ok": True, "redirect_url": redirect_url})
 
 # ---------- Admin: View Leads ----------
 @app.route("/api/leads", methods=["GET"])
