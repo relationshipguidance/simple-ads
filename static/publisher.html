@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Coffee Blog — Demo Publisher</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #222; }
+    h1 { font-size: 28px; }
+    .meta { color: #888; font-size: 13px; }
+    .ad-slot { margin: 24px 0; }
+    .ad {
+      border: 1px solid #e5e7eb;
+      background: #fffbeb;
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+    }
+    .ad-label { position: absolute; top: 8px; right: 10px; font-size: 10px; color: #a16207; font-weight: 700; letter-spacing: 0.05em; }
+    .ad .adv { font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+    .ad .ttl { font-size: 18px; font-weight: 700; margin: 6px 0; color: #92400e; }
+    .ad .bdy { font-size: 14px; color: #444; margin-bottom: 8px; }
+    .ad .cta { display: inline-block; font-size: 13px; font-weight: 600; color: #92400e; text-decoration: underline; }
+    .controls { background: #f3f4f6; padding: 12px; border-radius: 8px; margin: 20px 0; font-size: 13px; }
+    .controls input { padding: 6px; border: 1px solid #d1d5db; border-radius: 6px; }
+    .controls button { padding: 6px 12px; border: none; background: #4f46e5; color: white; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>☕ The Daily Grind — A Coffee Blog</h1>
+  <p class="meta">Published today · 3 min read</p>
+
+  <p>Welcome to our little corner of the internet. We talk about <b>coffee</b>, brewing techniques, and where to find the best <b>breakfast</b> pairings in town.</p>
+
+  <div class="ad-slot" id="slot-top"></div>
+
+  <p>Espresso is a brewing method that forces hot water through finely-ground coffee at high pressure. The result is a concentrated shot with rich crema on top — the hallmark of a well-pulled espresso.</p>
+  <p>Whether you prefer a light roast with floral notes or a dark, chocolatey blend, the key is freshness. Beans taste best within 2–4 weeks of roasting.</p>
+
+  <div class="ad-slot" id="slot-bottom"></div>
+
+  <p>That's all for today. Come back tomorrow for our guide to pour-over brewing.</p>
+
+  <div class="controls">
+    <label>Page context (what this article is about): </label>
+    <input id="ctx" value="coffee breakfast brewing espresso beans delivery" style="width: 60%;" />
+    <button onclick="loadAds()">Reload Ads</button>
+    <span style="margin-left: 12px; color: #6b7280;">← change this and click reload to see different ads</span>
+  </div>
+
+  <script>
+    async function loadAds() {
+      const ctx = document.getElementById('ctx').value;
+      const res = await fetch('/api/serve?context=' + encodeURIComponent(ctx) + '&n=2');
+      const ads = await res.json();
+
+      const slots = ['slot-top', 'slot-bottom'];
+      slots.forEach((slotId, i) => {
+        const el = document.getElementById(slotId);
+        if (!ads[i]) { el.innerHTML = '<div class="ad"><div class="ad-label">AD</div><em>No ad available for this context.</em></div>'; return; }
+        const ad = ads[i];
+        el.innerHTML = `
+          <div class="ad">
+            <div class="ad-label">AD</div>
+            <div class="adv">${ad.advertiser}</div>
+            <div class="ttl">${ad.title}</div>
+            <div class="bdy">${ad.body}</div>
+            <a class="cta" href="/click/${ad.id}" target="_blank">Learn more →</a>
+          </div>
+        `;
+      });
+    }
+
+    loadAds();
+  </script>
+</body>
+</html>
